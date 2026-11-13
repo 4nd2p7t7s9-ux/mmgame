@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>호텔 방 탈출</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--main:#aaa4c9;--main-d:#7d76a8;--main-l:#f1eff8;--ink:#45405a;--cream:#fff;--sub:#8a84a6}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{background-color:#e4e1f0;background-image:radial-gradient(circle at 18px 18px,#fff 0 3px,transparent 4px),radial-gradient(circle at 58px 52px,#cfcbe2 0 4px,transparent 5px);background-size:80px 80px;color:var(--ink);font-family:"Noto Sans KR","Noto Sans TC",sans-serif;display:flex;padding:16px;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.win{margin:auto;width:100%;max-width:440px;background:var(--cream);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink)}
+.bar{background:var(--main);font-family:"Press Start 2P",monospace;font-size:8px;color:#fff;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid var(--ink)}
+.bar button{background:#fff;color:var(--ink);border:2px solid var(--ink);font:inherit;font-size:8px;padding:3px 6px;cursor:pointer}
+.mission{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--main-l);color:var(--ink);border-bottom:4px solid var(--ink)}
+.mission .n{font-family:"Press Start 2P",monospace;font-size:7px;background:var(--ink);color:#fff;padding:5px 6px;flex:none}
+.mission .t{font-size:13px;font-weight:900}
+.stage{border-bottom:4px solid var(--ink);line-height:0;position:relative}
+.stage svg{width:100%;height:auto;display:block}
+.hs{cursor:pointer}
+.hs:active{filter:brightness(1.12)}
+.inv{display:flex;gap:6px;padding:6px 10px;min-height:52px;border-bottom:4px solid var(--ink);background:var(--main-l);overflow-x:auto}
+.slot{flex:none;min-width:56px;border:3px solid var(--ink);background:#fff;padding:3px 6px;text-align:center;font-size:10px;font-weight:700;line-height:1.3}
+.slot b{display:block;font-size:18px;line-height:1.2;font-weight:400}
+.slot.on{background:#ffe58a;box-shadow:3px 3px 0 var(--ink);transform:translate(-1px,-1px)}
+.inv .empty{font-size:11px;color:var(--sub);align-self:center;padding-left:4px}
+.box{padding:0;cursor:pointer;min-height:138px}
+.cast{display:flex;align-items:flex-end;gap:12px;padding:10px 10px 0;height:128px}
+.cast:not(.talk){align-items:stretch;padding:10px 14px 0}
+.ch{flex:none;height:104px;width:auto;display:block;transition:opacity .15s}
+.ch.dim{opacity:.3}
+.cast:not(.talk) .ch{display:none}
+.bubs{flex:1;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:4px 0 12px}
+.bub{position:relative;margin:4px;max-width:calc(100% - 8px);background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #dcd8ec;padding:8px 10px;font-size:12.5px;line-height:1.45;font-weight:700;min-height:36px;display:flex;flex-direction:column;justify-content:center;visibility:hidden}
+.bub.on{visibility:visible}
+.bub.os{background:#f1eff8;color:#77709a}
+#bH{align-self:flex-start}
+#bM{align-self:flex-end}
+#bH::before,#bM::before{content:"";position:absolute;top:50%;margin-top:-6px;width:4px;height:4px;background:#fff}
+#bH::before{left:-4px;box-shadow:0 4px #fff,0 8px #fff,-4px 4px #fff,-4px 8px #fff,-8px 8px #fff,-4px 0 var(--ink),-4px 12px var(--ink),-8px 4px var(--ink),-8px 12px var(--ink),-12px 8px var(--ink)}
+#bM::before{right:-4px;box-shadow:0 4px #fff,0 8px #fff,4px 4px #fff,4px 8px #fff,8px 8px #fff,4px 0 var(--ink),4px 12px var(--ink),8px 4px var(--ink),8px 12px var(--ink),12px 8px var(--ink)}
+.bub.os::before{background:#f1eff8}
+.narr{padding:14px 16px 4px}
+.narr:empty{display:none}
+.bubs.sys #bH,.bubs.sys #bM{display:none}
+.bubs:not(.sys) #bN{display:none}
+#bN{visibility:visible;flex:1;padding:28px 12px 10px;font-weight:700;font-size:13px;justify-content:flex-start}
+#bN::before{content:attr(data-t);position:absolute;left:0;right:0;top:0;height:18px;line-height:18px;padding-left:8px;background:var(--main);color:#fff;font-family:"Press Start 2P",monospace;font-size:7px;box-shadow:0 3px 0 var(--ink)}
+#bN::after{content:"– □ ×";position:absolute;right:8px;top:0;height:18px;line-height:18px;color:#fff;font-size:10px;font-weight:900}
+.who{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tag{font-size:11px;font-weight:700;border:2px solid var(--ink);padding:3px 7px;background:#fff}
+.tag.plain{background:var(--ink);color:#fff;font-family:"Press Start 2P",monospace;font-size:8px;font-weight:400}
+.line{font-size:15px;line-height:1.5;font-weight:900}
+.line.nar{font-weight:700;font-size:14.5px;line-height:1.65}
+.choices{display:grid;gap:8px;margin-top:8px}
+.choice{border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:#fff;padding:10px 12px;font:inherit;font-size:14px;font-weight:900;color:var(--ink);text-align:left;cursor:pointer}
+.choice{display:flex;gap:10px;align-items:baseline}
+.choice i{font-style:normal;font-family:"Press Start 2P",monospace;font-size:10px;background:var(--ink);color:#fff;padding:4px 6px;flex:none}
+.choice:disabled{background:#ecebf1;color:#aaa6ba;border-color:#b9b5c9;box-shadow:none;cursor:default}
+.choice:disabled i{background:#b9b5c9}
+.choice.done{text-decoration:line-through}
+.choice:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.foot{padding:8px 14px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hint{font-size:11px;color:var(--sub)}
+.btn{background:var(--main-d);color:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-family:"Press Start 2P","Noto Sans KR","Noto Sans TC",sans-serif;font-size:10px;padding:10px 12px;cursor:pointer;white-space:nowrap}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn .lk,.btn .lz{font-family:"Noto Sans KR","Noto Sans TC",sans-serif;font-weight:900;font-size:14px}
+.hold{width:100%;margin-top:10px;padding:16px;font-size:16px;position:relative;overflow:hidden}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}
+.hold span{position:relative}
+.big{font-family:"Press Start 2P",monospace;font-size:22px;color:var(--main-d);margin:4px 0 8px}
+body.lang-ko{word-break:keep-all}
+body.lang-ko .lz{display:none}
+body.lang-zh .lk{display:none}
+#photo{position:absolute;inset:0;background:rgba(69,64,90,.28);display:flex;justify-content:center;align-items:flex-end;line-height:0}
+#photo img{height:96%}
+.mk.off{display:none}
+.mk{fill:#fff;stroke:#2f2350;stroke-width:6;pointer-events:none;animation:mk 1.1s steps(2) infinite}
+@keyframes mk{50%{opacity:.15}}
+.steps{font-size:13px;line-height:1.7;font-weight:700;color:#4a3d6e}
+.steps b{display:inline-block;min-width:20px;height:20px;line-height:20px;text-align:center;background:var(--ink);color:#fff;font-size:11px;margin-right:6px}
+.pola{display:block;width:190px;margin:4px auto 12px;box-shadow:4px 5px 0 rgba(69,64,90,.35);transform:rotate(-3deg);animation:pola 1s cubic-bezier(.2,1.2,.4,1) both}
+.cap{font-family:"Press Start 2P",monospace;font-size:8px;text-align:center;margin-bottom:10px;color:var(--main-d)}
+@keyframes pola{from{transform:translateY(-70px) rotate(4deg);opacity:0}}
+[hidden]{display:none !important}
+.bar a.home{background:#fff;color:var(--ink);border:2px solid var(--ink);font:inherit;font-size:8px;padding:4px 6px;text-decoration:none;white-space:nowrap}
+</style>
+</head>
+<body class="lang-ko">
+<div class="win">
+  <div class="bar"><a class="home" href="../">◀ HOME</a><span>ROOM 1237</span><button id="langBtn" type="button">KO</button></div>
+
+  <div class="inv" id="inv"></div>
+  <div class="stage">
+    <svg viewBox="0 0 1448 1086" xmlns="http://www.w3.org/2000/svg" id="room">
+      <image href="img/room.png" width="1448" height="1086"/>
+      <g class="hs" data-id="window"><rect x="515" y="170" width="467" height="318" fill="transparent"/></g>
+      <g class="hs" data-id="closet"><polygon points="1022,216 1278,216 1278,545 1160,545 1160,792 1022,792" fill="transparent"/></g>
+      <g class="hs" data-id="door">
+        <rect x="168" y="160" width="276" height="622" fill="transparent"/>
+        <rect x="246" y="178" width="122" height="50" fill="#1f2238"/>
+        <text id="doorTxt" x="307" y="217" text-anchor="middle" font-family="monospace" font-size="40" font-weight="bold" fill="#8dffb0">0/5</text>
+        <rect id="doorOpen" x="186" y="264" width="242" height="512" fill="#fff6d8" visibility="hidden"/>
+      </g>
+      <g class="hs" data-id="tv"><polygon id="tvScr" points="1304,338 1426,306 1426,540 1304,508" fill="transparent"/><polygon points="1288,322 1444,284 1444,560 1288,524" fill="transparent"/></g>
+      <g class="hs" data-id="outlet">
+        <rect x="495" y="505" width="95" height="88" fill="transparent"/>
+        <text id="plugTxt" x="541" y="524" text-anchor="middle" font-size="44"></text>
+      </g>
+      <g class="hs" data-id="kettle">
+        <rect x="22" y="496" width="132" height="160" fill="transparent"/>
+        <text id="steam" x="88" y="494" text-anchor="middle" font-size="40" font-weight="bold" fill="#2f2350"></text>
+      </g>
+      <g class="hs" data-id="ramen" id="ramenG" visibility="hidden">
+        <rect x="172" y="580" width="56" height="46" fill="#ff8f6b" stroke="#2f2350" stroke-width="8"/>
+        <rect x="164" y="568" width="72" height="14" fill="#fff" stroke="#2f2350" stroke-width="6"/>
+      </g>
+      <g class="hs" data-id="minibar"><polygon points="0,762 168,762 168,986 84,1012 0,1002" fill="transparent"/></g>
+      <g class="hs" data-id="bed"><polygon points="606,645 1016,645 1094,790 1094,915 562,915 562,790" fill="transparent"/></g>
+      <g class="hs" data-id="pillow"><rect x="688" y="566" width="254" height="76" fill="transparent"/></g>
+      <g class="hs" data-id="clock">
+        <rect x="474" y="588" width="116" height="70" fill="transparent"/>
+        <rect id="clockBg" x="496" y="611" width="74" height="35" fill="#3a1f33" visibility="hidden"/>
+        <text id="clockTxt" x="533" y="639" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#ffd6e6"></text>
+      </g>
+      <g class="hs" data-id="drawer"><rect x="448" y="660" width="164" height="146" fill="transparent"/></g>
+      <g class="hs" data-id="suitcase"><rect x="1156" y="544" width="150" height="290" fill="transparent"/></g>
+    </svg>
+  </div>
+
+  <div class="mission"><span class="n" id="mNo">MISSION 1/5</span><span class="t" id="mText"></span></div>
+  <div class="box" id="box">
+    <div class="cast" id="cast"><img class="ch" id="chH" src="img/hu.png" alt="" draggable="false"><div class="bubs"><div class="bub" id="bH"></div><div class="bub" id="bM"></div><div class="bub" id="bN"></div></div><img class="ch" id="chM" src="img/mi.png" alt="" draggable="false"></div>
+    <div class="narr" id="narr"></div>
+  </div>
+  <div class="foot">
+    <span class="hint" id="hintTxt"></span>
+    <span style="display:flex;gap:8px">
+      <button id="hintBtn" class="btn ghost" type="button" aria-label="hint" style="font-size:18px;padding:6px 12px">🔔</button>
+      <button id="nextBtn" class="btn" type="button">NEXT ▶</button>
+    </span>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const L = (ko, zh) => `<span class="lk">${ko}</span><span class="lz">${zh}</span>`;
+
+// ============ data ============
+const MISSIONS = [null,
+  ['둘이 같이 셀카 찍기', '兩個人一起自拍'],
+  ['상대방 머리 말려 주기', '幫對方吹頭髮'],
+  ['야식 같이 먹기', '一起吃宵夜'],
+  ['영화 한 편 끝까지 보기', '看完一部電影'],
+  ['10초 동안 손잡기', '牽手十秒'],
+  ['문이 열렸다', '門開了'],
+];
+const ITEMS = {
+  phone: ['📱', '휴대폰', '手機'], cable: ['🔌', '충전기', '充電線'], dryer: ['🌬️', '드라이기', '吹風機'],
+  water: ['💧', '물', '水'], ramen: ['🍜', '컵라면', '泡麵'], chop: ['🥢', '젓가락', '筷子'],
+  remote: ['🎛️', '리모컨', '遙控器'], batt: ['🔋', '건전지', '電池'],
+};
+const TAGS = {
+  h: ['bH', L('후후', '熏熏'), ''], m: ['bM', L('만재', '財財'), ''],
+  ho: ['bH', L('후후 속마음', '熏熏 內心'), 'os'], mo: ['bM', L('만재 속마음', '財財 內心'), 'os'],
+};
+function br(t, zh) {
+  return zh ? t.replace(/([。！？])(?=[^」）)。！？，\s])/g, '$1<br>') : t.replace(/([.?!]) (?=\S)/g, '$1<br>');
+}
+const LB = (ko, zh) => L(br(ko), br(zh, 1));
+function setNarr(html) { $('bH').className = $('bM').className = 'bub'; $('cast').classList.remove('talk'); $('cast').hidden = !!html; $('bN').parentNode.classList.remove('sys'); $('narr').innerHTML = html; }
+function setSide(tag, html) { setNarr(`<div class="who"><span class="tag plain">${tag}</span></div><div class="line nar">${html}</div>`); }
+
+// ============ state ============
+let S, queue = [], qi = 0, after = null, busy = false, choosing = false, holding = false, holdT = null;
+function reset() {
+  S = { m: 0, inv: [], plug: null, F: {}, hints: 0, t0: 0, end: false };
+}
+const has = x => S.inv.includes(x);
+const add = (...xs) => xs.forEach(x => { if (!has(x)) S.inv.push(x); });
+const del = x => { S.inv = S.inv.filter(i => i !== x); };
+
+// ============ rendering ============
+function render() {
+  const m = Math.min(S.m, 5), done = Math.min(Math.max(S.m - 1, 0), 5);
+  $('mNo').textContent = S.m >= 6 ? 'CLEAR' : `MISSION ${m}/5`;
+  $('mNo').parentNode.hidden = !S.m;
+  $('mText').innerHTML = S.m ? L(...MISSIONS[S.m]) : '';
+  $('doorTxt').textContent = done + '/5';
+  $('doorOpen').setAttribute('visibility', S.m >= 6 ? 'visible' : 'hidden');
+  $('plugTxt').textContent = { cable: '🔌', phone: '📱', dryer: '🌬️', kettle: '♨' }[S.plug] || '';
+  $('steam').textContent = S.F.hot ? '~ ~' : '';
+  $('ramenG').setAttribute('visibility', S.F.ready && S.m === 3 ? 'visible' : 'hidden');
+  $('clockTxt').textContent = S.F.batt ? '--:--' : '';
+  $('clockBg').setAttribute('visibility', S.F.batt ? 'visible' : 'hidden');
+  $('tvScr').setAttribute('fill', S.m > 4 ? '#8dd8ff' : 'transparent');
+  $('inv').innerHTML = S.inv.length
+    ? S.inv.map(i => `<div class="slot"><b>${ITEMS[i][0]}</b>${L(ITEMS[i][1], ITEMS[i][2])}</div>`).join('')
+    : `<span class="empty">${L('아직 가진 물건이 없어요', '還沒有道具')}</span>`;
+  $('nextBtn').hidden = !busy;
+  document.querySelectorAll('#room .hs').forEach(g => { const c = g.querySelector('.mk'); if (c) c.classList.toggle('off', busy || choosing || holding || S.end || !S.m); });
+  $('hintBtn').hidden = busy || choosing || holding || S.end || !S.m;
+}
+function drawLine() {
+  const [who, ko, zh, fx] = queue[qi];
+  const t = TAGS[who];
+  if (t) {
+    setNarr('');
+    $(t[0]).className = 'bub on ' + t[2];
+    $('cast').classList.add('talk');
+    $('chH').classList.toggle('dim', t[0] !== 'bH'); $('chM').classList.toggle('dim', t[0] !== 'bM');
+    $(t[0]).innerHTML = LB(ko, zh);
+  } else setSide('NARRATION', LB(ko, zh));
+  $('hintTxt').innerHTML = '';
+}
+// 現在該做什麼：每次對話結束後都會顯示這一句
+function goal() {
+  const F = S.F;
+  switch (S.m) {
+    case 1: return !F.phone ? ['휴대폰을 찾아보세요.', '請開始尋找手機。'] : !F.cable ? ['충전기를 찾아보세요.', '請開始尋找充電線。'] : ['콘센트로 휴대폰을 충전하세요.', '請用插座幫手機充電。'];
+    case 2: return !F.dryer ? ['드라이기를 찾아보세요.', '請開始尋找吹風機。'] : ['드라이기를 콘센트에 꽂으세요.', '請把吹風機插到插座上。'];
+    case 3: return !F.food ? ['먹을 것을 찾아보세요.', '請開始尋找吃的。'] : !F.hot ? ['주전자로 물을 끓이세요.', '請用熱水壺燒水。'] : !F.ready ? ['컵라면에 뜨거운 물을 부으세요.', '請把熱水倒進泡麵。'] : !F.chop ? ['젓가락을 찾아보세요.', '請開始尋找筷子。'] : ['이제 먹어 볼까요? 컵라면을 누르세요.', '可以開動了，請點泡麵。'];
+    case 4: return !F.remote ? ['리모컨을 찾아보세요.', '請開始尋找遙控器。'] : !F.batt ? ['리모컨에 건전지가 없어요. 건전지를 찾아보세요.', '遙控器沒有電池。請開始尋找電池。'] : ['TV를 켜 보세요.', '請打開電視。'];
+    default: return ['문을 열어 보세요.', '請打開門。'];
+  }
+}
+function idle() {
+  const [ko, zh] = goal();
+  if (S.m === 1 && !S.inv.length && !S.plug) {
+    setNarr(`<div class="who"><span class="tag plain">HOW TO</span></div><div class="steps">${L('<b>1</b>먼저 미션을 확인해요<br><b>2</b>방 안의 반짝이는 곳을 눌러요<br><b>3</b>물건을 찾으면, 쓸 곳을 눌러요', '<b>1</b>先看任務題目<br><b>2</b>點房間裡會閃的地方<br><b>3</b>找到道具後，再點要使用它的地方')}</div><div class="who" style="margin-top:10px"><span class="tag plain">SEARCH</span></div><div class="line nar">${LB(ko, zh)}</div>`);
+    $('hintTxt').innerHTML = L('힌트가 필요하면 🔔를 누르세요', '需要提示請按 🔔');
+    return;
+  }
+  setSide('SEARCH', LB(ko, zh));
+  $('hintTxt').innerHTML = S.m < 6 ? L('힌트가 필요하면 🔔를 누르세요', '需要提示請按 🔔') : '';
+}
+
+// ============ dialogue ============
+function say(lines, cb) {
+  queue = lines; qi = 0; after = cb || null; busy = true;
+  render(); drawLine();
+}
+function next() {
+  if (!busy) return;
+  if (++qi < queue.length) { drawLine(); return; }
+  busy = false; const cb = after; after = null;
+  if (cb) cb(); else { render(); idle(); }
+}
+// 選項要照 1、2、3 的順序按：還沒輪到的是灰色，按過的會劃掉
+function ask(ko, zh, opts, onAll, step = 0, any = false) {
+  choosing = true; render();
+  setNarr(`<div class="who"><span class="tag plain">CHOOSE</span></div><div class="line">${L(ko, zh)}</div><div class="choices">${
+    opts.map((o, i) => `<button class="choice${i < step ? ' done' : ''}" data-c="${i}" type="button"${any || i === step ? '' : ' disabled'}><i>${i + 1}</i><span>${L(o[0], o[1])}</span></button>`).join('')}</div>`);
+  $('hintTxt').innerHTML = '';
+  $('box').querySelectorAll('.choice').forEach(b => b.onclick = e => {
+    const i = +b.dataset.c;
+    e.stopPropagation(); if (!any && i !== step) return;
+    choosing = false;
+    say(opts[i][2], () => !any && step + 1 < opts.length ? ask(ko, zh, opts, onAll, step + 1) : onAll());
+  });
+}
+function clear(n, lines, tail) {
+  say(lines.concat(tail || [], [['n', `미션 ${n} 완료! (${n}/5)`, `任務 ${n} 完成！（${n}/5）`, '']]), () => { S.m = n + 1; render(); intro(n + 1); });
+}
+const N = (ko, zh, fx) => ['n', ko, zh, fx];
+const NOPE = () => say([N('지금은 볼일이 없다.', '現在用不到。')]);
+
+// ============ missions ============
+function intro(m) {
+  if (m === 2) say([['h', '머리 말려 주기? 드라이기부터 찾자!', '吹頭髮？先找吹風機！']]);
+  else if (m === 3) say([['h', '야식이다! 뭐 먹을 거 없나?', '宵夜耶！有沒有吃的？'], ['m', '……미니바 한번 봐.', '……看看小冰箱。']]);
+  else if (m === 4) say([['h', '영화! 리모컨이 어디 있지?', '電影！遙控器在哪裡？']]);
+  else if (m === 5) say([['h', '마지막 미션이다! 손…… 잡기?', '最後一個任務！牽……手？'], ['m', '……', '……'], N('만재가 반 걸음 물러섰다.', '財財往後退了半步。')], hand);
+  else if (m === 6) say([N('철컥. 문이 열렸다.', '喀嚓。門開了。')]);
+  else { render(); idle(); }
+}
+function hand() {
+  ask('후후는 어떻게 할까?', '熏熏要怎麼做？', [
+    ['그냥 확 잡는다!!!!!!', '直接抓住他的手!!!!!!', [N('만재가 손을 뒤로 숨겼다.', '財財把手藏到背後。'), ['mo', '(갑자기는 무리야.)', '(太突然了，不行。)']]],
+    ['“만재야, 미션이니까 어쩔 수 없잖아ㅜㅜ”', '「財財這是任務，沒辦法啊ㅜㅜ」', [['m', '……알아.', '……我知道。'], N('그래도 손은 주머니에서 나오지 않았다.', '但他的手還是沒有從口袋裡出來。'), ['mo', '(미션이라서 잡는 건 싫은데.)', '(不想只是因為任務才牽。)']]],
+    ['손을 내밀고 기다린다', '伸出手，等他', [N('후후는 아무 말 없이 손을 내밀었다. 잠옷 소매가 손을 덮고 있었다.', '熏熏什麼都沒說，只是伸出手。睡衣的袖子蓋住了手。'), N('한참 뒤, 만재의 손이 천천히 올라왔다.', '過了很久，財財的手慢慢伸了過來。'), ['mo', '(……기다려 주는구나.)', '(……他在等我。)']]],
+  ], hold);
+}
+function hold() {
+  holding = true; render();
+  setNarr(`<div class="who"><span class="tag plain">HOLD</span></div><div class="line" id="holdLine">${L('버튼을 10초 동안 꾹 누르세요.', '按住按鈕 10 秒不要放開。')}</div>
+    <button id="holdBtn" class="btn hold" type="button"><i id="holdBar"></i><span>${L('손잡기', '牽手')} <b id="holdNum">10</b></span></button>`);
+  $('hintTxt').innerHTML = '';
+  const b = $('holdBtn'); let start = 0;
+  const stop = ok => {
+    clearInterval(holdT); holdT = null;
+    if (ok) { holding = false; clear(5, [N('10초가 지났다.', '十秒過去了。'), ['m', '……됐다.', '……好了。'], N('그런데 아무도 손을 놓지 않았다.', '可是誰都沒有放開手。')]); }
+    else if (start) { start = 0; $('holdBar').style.width = '0'; $('holdNum').textContent = '10'; $('holdLine').innerHTML = L('손을 놓아 버렸다. 처음부터 다시!', '手放開了。重新來！'); }
+  };
+  b.onpointerdown = e => {
+    e.preventDefault(); e.stopPropagation(); if (holdT) return; start = Date.now();
+    holdT = setInterval(() => {
+      const s = (Date.now() - start) / 1000, left = Math.max(0, 10 - s);
+      $('holdBar').style.width = Math.min(100, s * 10) + '%'; $('holdNum').textContent = Math.ceil(left);
+      $('holdLine').innerHTML = s < 1 ? '&nbsp;' : s < 4 ? L('후후: (……)', '熏熏：(……)') : s < 7 ? L('만재: (10초가 이렇게 길었나.)', '財財：(十秒有這麼長嗎。)') : L('후후: (이 미션 진짜 좋다.)', '熏熏：(這任務真好。)');
+      if (s >= 10) stop(true);
+    }, 100);
+  };
+  b.onpointerup = b.onpointerleave = b.onpointercancel = () => stop(false);
+  b.onclick = e => e.stopPropagation();
+}
+function ending() {
+  S.end = true;
+  say([N('문은 열렸는데, 둘 다 움직이지 않았다.', '門開了，可是兩個人都沒有動。'), ['h', '……만재야, 손.', '……財財，手。'], ['m', '미안……', '抱歉……']], () => {
+    const sec = Math.round((Date.now() - S.t0) / 1000), t = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+    render();
+    setNarr(`<div class="who"><span class="tag plain">THE END</span></div>
+      <img class="pola" src="img/polaroid.jpg" alt="">
+      <div class="cap">ROOM 1237 ♥ ${t}</div>
+      <div class="line" style="text-align:center">${L('탈출 성공! ……아마도.', '逃脫成功！……大概。')}</div>
+      <div style="text-align:center"><button id="again" class="btn" type="button" style="margin-top:10px">RETRY</button></div>`);
+    $('hintTxt').innerHTML = '';
+    $('again').onclick = e => { e.stopPropagation(); begin(); };
+  });
+}
+
+// ============ room interactions ============
+// 目前這個任務裡，這個東西點了會不會有進展（決定白點要不要閃）
+function useful(t) {
+  const m = S.m, F = S.F;
+  if (m === 1) return (t === 'pillow' && !F.phone) || (t === 'suitcase' && !F.cable) || t === 'outlet';
+  if (m === 2) return (t === 'closet' && !F.dryer) || t === 'outlet';
+  if (m === 3) return (t === 'minibar' && !F.food) || (t === 'drawer' && !F.chop) || (t === 'kettle' && !F.ready) || (t === 'ramen' && F.ready);
+  if (m === 4) return (t === 'bed' && !F.remote) || (t === 'clock' && !F.batt) || t === 'tv';
+  if (m >= 6) return t === 'door';
+  return false;
+}
+function act(t) {
+  if (choosing || holding || S.end || !S.m) return;
+  if (busy) return next();
+  const m = S.m, F = S.F;
+  const LOAD = N('리모컨에 건전지를 넣었다.', '把電池裝進遙控器。');
+  switch (t) {
+    case 'window': return say([N('여기는 20층이다.', '這裡是 20 樓。')]);
+    case 'door':
+      if (m >= 6) return ending();
+      return say([N(`문은 잠겨 있다. 화면에는 「${m - 1}/5」.`, `門鎖著。螢幕上顯示「${m - 1}/5」。`)]);
+    case 'pillow':
+      if (m === 1 && !F.phone) { F.phone = 1; add('phone'); return say([['h', '베개 밑에 휴대폰이 있어! ……근데 꺼져 있네.', '枕頭下面有手機！……可是沒電了。']]); }
+      return NOPE();
+    case 'suitcase':
+      if (m === 1 && !F.cable) { F.cable = 1; add('cable'); return say([['m', '캐리어에 충전기 있어.', '行李箱裡有充電線。']]); }
+      return NOPE();
+    case 'closet':
+      if (m === 2 && !F.dryer) { F.dryer = 1; add('dryer'); return say([N('옷장 안에 드라이기가 있다.', '衣櫃裡有吹風機。')]); }
+      return NOPE();
+    case 'minibar':
+      if (m === 3 && !F.food) { F.food = 1; add('water', 'ramen'); return say([N('미니바에 물이랑 컵라면이 하나 있다.', '小冰箱裡有水和一碗泡麵。')]); }
+      return NOPE();
+    case 'drawer':
+      if (m === 3 && !F.chop) { F.chop = 1; add('chop'); return say([N('서랍에 젓가락이 한 쌍 있다.', '抽屜裡有一雙筷子。')]); }
+      return NOPE();
+    case 'bed':
+      if (m === 4 && !F.remote) {
+        F.remote = 1; add('remote');
+        const l = [N('이불 속에서 리모컨이 나왔다.', '棉被裡找到遙控器。')];
+        if (has('batt')) { del('batt'); F.on = 1; l.push(LOAD); return say(l, () => { render(); idle(); }); }
+        return say(l);
+      }
+      return NOPE();
+    case 'clock':
+      if (m === 4 && !F.batt) {
+        F.batt = 1; add('batt');
+        const l = [N('알람 시계에서 건전지를 뺐다. 시계가 멈췄다.', '從鬧鐘拿出電池。時鐘停了。'), ['h', '이제 몇 시인지 모르겠다.', '這樣就不知道幾點了。'], ['m', '……몰라도 돼.', '……不知道也沒關係。']];
+        if (has('remote')) { del('batt'); F.on = 1; l.push(LOAD); }
+        return say(l, () => { render(); idle(); });
+      }
+      return say([N(F.batt ? '시계는 멈춰 있다.' : '알람 시계. 12시 정각.', F.batt ? '時鐘停著。' : '鬧鐘。12 點整。')]);
+    case 'outlet':
+      if (m === 1) {
+        if (S.plug !== 'cable' && !has('cable')) {
+          if (has('phone')) return say([['m', '충전기가 없으면 충전을 못 해.', '沒有充電線，沒辦法充電。']]);
+        } else if (has('phone')) {
+          const first = has('cable');
+          del('cable'); del('phone'); S.plug = 'phone';
+          return clear(1, [first ? N('충전기를 콘센트에 꽂고 휴대폰을 연결했다. 화면이 켜졌다.', '把充電線插上插座，接上手機。螢幕亮了。') : N('휴대폰을 충전기에 연결했다. 화면이 켜졌다.', '把手機接上充電線。螢幕亮了。'), ['h', '만재야 이리 와, 찍는다! 하나, 둘—', '財財過來，要拍囉！一、二—']],
+            [N('찰칵.', '喀嚓。'), ['h', '잘 나왔다!', '拍得很好耶！'], ['mo', '(나한테도 보내 줘.)', '(要傳給我。)']]);
+        } else if (has('cable')) {
+          del('cable'); S.plug = 'cable';
+          return say([N('충전기를 먼저 콘센트에 꽂아 두었다.', '先把充電線插在插座上了。'), ['m', '이제 휴대폰이 필요해.', '還需要手機。']], () => { render(); idle(); });
+        } else return say([N('충전기가 꽂혀 있다. 휴대폰만 있으면 된다.', '充電線已經插好了，只差手機。')]);
+      }
+      if (m === 2 && has('dryer')) {
+        del('dryer'); S.plug = 'dryer'; render();
+        return say([['m', '콘센트가 하나뿐이라, 휴대폰부터 뽑아야 해.', '插座只有一個，要先拔掉手機。'], N('휴대폰 충전기를 뽑고 드라이기를 꽂았다.', '拔掉手機的充電線，換上吹風機。')], () => ask('누가 말려 줄까?', '誰幫誰吹？', [
+          ['후후가 만재 머리 말려 주기', '熏熏幫財財吹', [['h', '가만히 있어 봐.', '不要動喔。'], ['m', '……뜨거워.', '……好燙。'], ['h', '아, 미안!', '啊，對不起！'], ['mo', '(사실 하나도 안 뜨거웠다ㅎ)', '(其實一點都不燙ㅎ)']]],
+          ['만재가 후후 머리 말려 주기', '財財幫熏熏吹', [['m', '……눈 감아.', '……眼睛閉起來。'], ['h', '왜?', '為什麼？'], ['m', '바람 들어가니까.', '風會吹進去。'], ['ho', '(잠들 것 같아.)', '(要睡著了。)']]],
+        ], () => clear(2, []), 0, true));
+      }
+      return say([N(S.plug ? '콘센트에는 지금 뭔가 꽂혀 있다.' : '이 방에 콘센트는 이것 하나뿐이다.', S.plug ? '插座現在有東西插著。' : '這個房間只有這一個插座。')]);
+    case 'kettle': case 'ramen':
+      if (m !== 3) return NOPE();
+      if (!F.food) return say([['m', '주전자에 물이 없어.', '熱水壺裡沒有水。']]);
+      if (!F.hot) {
+        del('water'); F.kw = F.hot = 1; S.plug = 'kettle'; render();
+        return say([N('주전자에 물을 부었다.', '把水倒進熱水壺。'), ['h', '콘센트가 또 차 있네…… 드라이기부터 뽑자.', '插座又被佔住了……先把吹風機拔掉吧。'], N('주전자를 꽂자 금방 물이 끓었다.', '熱水壺插上電，水很快就燒開了。')], () => { render(); idle(); });
+      }
+      if (!F.ready) { del('ramen'); F.ready = 1; return say([N('컵라면에 뜨거운 물을 부었다. 3분만 기다리면 된다.', '把熱水倒進泡麵。等三分鐘就好。')]); }
+      if (!has('chop')) return say([['h', '다 익었다! 근데 젓가락이 없어.', '泡好了！可是沒有筷子。']]);
+      del('chop'); render();
+      return clear(3, [['h', '젓가락이 한 쌍뿐이네.', '筷子只有一雙耶。'], ['m', '……너 먼저 먹어.', '……你先吃。'], ['h', '그럼 번갈아 먹자. 자, 아—', '那我們輪流吃。來，啊—'], ['m', '……내가 먹을 수 있어.', '……我自己會吃。'], ['mo', '(결국 받아먹었다.)', '(結果還是被餵了。)']]);
+    case 'tv':
+      if (m !== 4) return NOPE();
+      if (!has('remote')) return say([['m', '리모컨이 있어야 해.', '要有遙控器。']]);
+      if (!F.on) return say([['h', '안 켜져. 건전지가 없나 봐.', '打不開。好像沒電池。']]);
+      del('remote'); render();
+      return clear(4, [N('영화가 시작됐다. 두 사람은 침대에 나란히 앉았다.', '電影開始了。兩人並肩坐在床上。'), ['h', '미안.', '抱歉。'], ['m', '……', '……'], N('영화가 끝날 때까지, 아무도 자리를 옮기지 않았다.', '直到電影結束，誰都沒有移動位置。')]);
+  }
+}
+function hintText() {
+  const F = S.F;
+  switch (S.m) {
+    case 1: return !F.phone ? ['베개 쪽을 살펴봐.', '看看枕頭那邊。'] : !F.cable ? ['캐리어 안에 뭔가 있을지도.', '行李箱裡可能有東西。'] : ['콘센트를 눌러 봐.', '點點看插座。'];
+    case 2: return !F.dryer ? ['옷장을 열어 봐.', '打開衣櫃看看。'] : ['콘센트를 눌러 봐.', '點點看插座。'];
+    case 3: return !F.food ? ['미니바를 열어 봐.', '打開小冰箱看看。'] : !F.ready ? ['주전자를 눌러 봐.', '點點看熱水壺。'] : !F.chop ? ['침대 옆 서랍을 열어 봐.', '打開床邊的抽屜看看。'] : ['컵라면을 눌러 봐.', '點點看泡麵。'];
+    case 4: return !F.remote ? ['이불 속을 살펴봐.', '找找棉被裡面。'] : !F.batt ? ['알람 시계에 건전지가 있을 거야.', '鬧鐘裡應該有電池。'] : ['TV를 눌러 봐.', '點點看電視。'];
+    default: return ['문을 눌러 봐.', '點點看門。'];
+  }
+}
+
+// ============ wiring ============
+$('room').addEventListener('click', e => { const g = e.target.closest('.hs'); if (g) act(g.dataset.id); });
+$('box').addEventListener('click', next);
+$('nextBtn').addEventListener('click', next);
+$('hintBtn').addEventListener('click', () => { if (busy) return; S.hints++; const [ko, zh] = hintText(); say([['m', ko, zh]]); });
+$('langBtn').onclick = function () { const zh = document.body.className === 'lang-ko'; document.body.className = zh ? 'lang-zh' : 'lang-ko'; this.textContent = zh ? '中' : 'KO'; };
+
+document.querySelectorAll('#room .hs').forEach(g => {
+  const b = g.getBBox(), c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('class', 'mk'); c.setAttribute('cx', b.x + b.width / 2); c.setAttribute('cy', b.y + b.height / 2); c.setAttribute('r', 13);
+  c.style.animationDelay = (Math.random() * 1.1).toFixed(2) + 's'; g.appendChild(c);
+});
+
+function begin() {
+  reset(); render();
+  say([
+    N('눈을 떠 보니 호텔 방이었다. 그런데…… 문이 잠겨 있다……', '睜開眼，發現是飯店房間。但……門被鎖了……'),
+    N('미션 5개를 완료하면 문이 열립니다.', '完成 5 個任務，門就會打開。'),
+    ['h', '만재야, 우리 갇힌 거야?', '財財，我們被關起來了嗎？'],
+    ['m', '……그런 것 같네.', '……好像是。'],
+    ['ho', '(근데 왜 조금 신나지.)', '(可是為什麼有點開心。)'],
+  ], () => { S.m = 1; S.t0 = Date.now(); render(); idle(); });
+}
+begin();
+</script>
+</body>
+</html>
