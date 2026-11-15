@@ -88,7 +88,7 @@ body.lang-zh .zh.os::before{content:"♥ ";color:var(--pink-d)}
   <div class="bar">
     <a class="home" href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a>
     <div class="bar-btns">
-      <button id="sndBtn" data-mm="1" type="button">♪ ON</button>
+      <button id="sndBtn" data-mm="1" type="button">♪ OFF</button>
       <button id="langBtn" type="button">KO</button>
       <button id="menuBtn" type="button" hidden>MENU</button>
     </div>
@@ -418,7 +418,7 @@ $('cg').onclick = () => {
 // ============ BGM ============
 const bgm = new Audio('audio/bgm.mp3');
 bgm.loop = true; bgm.volume = 0.35;
-let musicOn = true;
+let musicOn = false;
 const EMBED = window.parent !== window;   // 從主頁打開時，音樂由主頁播放
 function playBgm(){ if(!EMBED && musicOn && bgm.paused) bgm.play().catch(()=>{}); }
 function renderSnd(){

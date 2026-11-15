@@ -78,7 +78,7 @@ body.playing{overflow:hidden}
 <main class="win">
   <div class="bar">
     <span class="dots"><i></i><i></i><i></i></span>
-    <span style="display:flex;gap:6px"><button id="sndBtn" type="button">♪ ON</button><button id="langBtn" type="button">KO</button></span>
+    <span style="display:flex;gap:6px"><button id="sndBtn" type="button">♪ OFF</button><button id="langBtn" type="button">KO</button></span>
   </div>
 
   <header class="hero">
@@ -136,7 +136,7 @@ body.playing{overflow:hidden}
 <script>
 // ---- 音樂：在主頁播放，遊戲開在主頁裡面，所以換遊戲音樂不會斷 ----
 const bgm = new Audio('pepero-mate/audio/bgm.mp3'); bgm.loop = true; bgm.volume = 0.35;
-let musicOn = true;
+let musicOn = false;
 const playBgm = () => { if (musicOn && bgm.paused) bgm.play().catch(() => {}); };
 const sndBtn = document.getElementById('sndBtn');
 const tellGame = () => { if (!frame.hidden && frame.contentWindow) frame.contentWindow.postMessage({ mmSnd: musicOn }, '*'); };
