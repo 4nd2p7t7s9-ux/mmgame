@@ -82,7 +82,7 @@ body.lang-zh .lk{display:none}
 <body class="lang-ko">
 <div class="win" id="win">
   <div class="bar">
-    <a class="home" href="../">◀ HOME</a>
+    <a class="home" href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a>
     <div class="bar-btns">
       <button id="langBtn" type="button">KO</button>
     </div>

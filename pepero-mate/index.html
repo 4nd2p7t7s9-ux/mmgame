@@ -86,7 +86,7 @@ body.lang-zh .zh.os::before{content:"♥ ";color:var(--pink-d)}
 <body>
 <div class="win">
   <div class="bar">
-    <a class="home" href="../">◀ HOME</a>
+    <a class="home" href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a>
     <div class="bar-btns">
       <button id="sndBtn" type="button">♪ ON</button>
       <button id="langBtn" type="button">KO</button>
@@ -419,7 +419,8 @@ $('cg').onclick = () => {
 const bgm = new Audio('audio/bgm.mp3');
 bgm.loop = true; bgm.volume = 0.35;
 let musicOn = true;
-function playBgm(){ if(musicOn && bgm.paused) bgm.play().catch(()=>{}); }
+const EMBED = window.parent !== window;   // 從主頁打開時，音樂由主頁播放
+function playBgm(){ if(!EMBED && musicOn && bgm.paused) bgm.play().catch(()=>{}); }
 function renderSnd(){
   const b=$('sndBtn'); b.textContent = musicOn ? '♪ ON' : '♪ OFF';
   b.classList.toggle('off', !musicOn);
@@ -432,6 +433,7 @@ function toggleSound(){
 // 瀏覽器需要使用者操作後才能播放音樂，所以第一次點畫面時開始播
 document.addEventListener('pointerdown', playBgm);
 $('sndBtn').addEventListener('click', e => { e.stopPropagation(); toggleSound(); });
+if (EMBED) $('sndBtn').hidden = true;
 renderSnd();
 
 // ============ 語言切換 ============
