@@ -246,7 +246,7 @@ const ITEMS = [
     + chairY(3.6, 1.7, '#e9a36b') + chairY(5.0, 1.7, '#e9a36b')],
   ['frame', bx(5.4, .35, 1.12, .5, .1, .55, '#ffffff', { fy: '#f7b5cf' })],
   ['book', bx(4.3, .7, 1.12, .6, .45, .14, '#7fb6c6')],
-  ['shoes', bx(.4, 3.0, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 2.96, 4.5, .83, .58, .09, '#222222') + bx(.4, 3.95, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 3.91, 4.5, .83, .58, .09, '#222222')],
+  ['shoes', bx(.4, 3.0, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 2.96, 4.5, .83, .58, .09, '#222222') + bx(.4, 3.95, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 3.91, 4.5, .83, .58, .09, '#222222') + [[.36, 2.96], [.36, 3.91]].map(([x, y]) => `<polyline points="${[[x + .2, y + .3], [x + .36, y + .46], [x + .7, y + .1]].map(q => P(q[0], q[1], 4.59).map(n => n.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`).join('')],
   ['tv', bx(.2, 5.5, 0, .8, 2.2, .7, WOOD) + bx(.45, 5.7, .7, .16, 1.8, 1.2, '#3e4a66', { fx: '#8dd8ff' })],
   ['console', bx(.7, 6.25, .7, .26, .7, .12, '#ffffff') + bx(.72, 6.5, .82, .1, .2, .04, '#ff7fb5')],
   ['plant', bx(.3, 8.0, 0, .45, .45, .5, '#e08a5b') + (([x, y]) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 24}" stroke="#5e9c4f" stroke-width="3"/><ellipse cx="${x - 6}" cy="${y - 9}" rx="6" ry="3" fill="#7dbb6a" transform="rotate(25 ${x - 6} ${y - 9})"/><ellipse cx="${x + 6}" cy="${y - 14}" rx="6" ry="3" fill="#7dbb6a" transform="rotate(-25 ${x + 6} ${y - 14})"/>`
