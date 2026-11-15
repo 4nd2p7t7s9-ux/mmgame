@@ -200,7 +200,13 @@ function win(n, st) {
     <div class="line">${first ? L(`「${ko}」을(를) 얻었어요!`, `得到「${zh}」了！`) : L('다시 깼어요!', '再次過關！')}</div>
     <div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
   $('nx').onclick = () => {
-    const after = () => (stars.every(x => x === 3) && !seenEnd) ? (seenEnd = true, save(), say(TALK.end, () => home())) : home();
+    const after = () => {
+      if (!stars.every(x => x === 3) || seenEnd) return home();
+      seenEnd = true; save(); info(L('우리 집', '我們的家'), 'ALL CLEAR');
+      $('box').innerHTML = `<div class="tag">ALL CLEAR</div><div class="stars">★★★</div><div class="line">${L('축하해요! 전부 ★★★로 깼어요!', '恭喜！全部三顆星！')}</div>
+        <div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
+      $('nx').onclick = () => say(TALK.end, () => home());
+    };
     // 三顆星：先顯示「額外禮物」，再出現那個禮物的對話
     const giftStep = () => {
       if (!newGift) return after();
@@ -240,20 +246,21 @@ const ITEMS = [
     + chairY(3.6, 1.7, '#e9a36b') + chairY(5.0, 1.7, '#e9a36b')],
   ['frame', bx(5.4, .35, 1.12, .5, .1, .55, '#ffffff', { fy: '#f7b5cf' })],
   ['book', bx(4.3, .7, 1.12, .6, .45, .14, '#7fb6c6')],
-  ['pajama', bx(.4, 3.0, 4.2, .7, .6, .16, '#d9d6dc') + bx(.4, 3.9, 4.2, .7, .6, .16, '#2d3148')],
+  ['shoes', bx(.4, 3.0, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 2.96, 4.5, .83, .58, .09, '#222222') + bx(.4, 3.95, 4.2, .75, .5, .3, '#ffffff') + bx(.36, 3.91, 4.5, .83, .58, .09, '#222222')],
   ['tv', bx(.2, 5.5, 0, .8, 2.2, .7, WOOD) + bx(.45, 5.7, .7, .16, 1.8, 1.2, '#3e4a66', { fx: '#8dd8ff' })],
   ['console', bx(.7, 6.25, .7, .26, .7, .12, '#ffffff') + bx(.72, 6.5, .82, .1, .2, .04, '#ff7fb5')],
-  ['plant', bx(.3, 8.0, 0, .45, .45, .5, '#e08a5b') + bx(.47, 8.17, .5, .1, .1, 1.1, '#7dbb6a') + bx(.3, 8.2, .9, .2, .12, .2, '#8fcf7a') + bx(.27, 8.0, 1.6, .5, .5, .14, '#ffd24d') + bx(.42, 8.15, 1.74, .2, .2, .06, '#9c6f52')],
+  ['plant', bx(.3, 8.0, 0, .45, .45, .5, '#e08a5b') + (([x, y]) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 24}" stroke="#5e9c4f" stroke-width="3"/><ellipse cx="${x - 6}" cy="${y - 9}" rx="6" ry="3" fill="#7dbb6a" transform="rotate(25 ${x - 6} ${y - 9})"/><ellipse cx="${x + 6}" cy="${y - 14}" rx="6" ry="3" fill="#7dbb6a" transform="rotate(-25 ${x + 6} ${y - 14})"/>`
+    + Array.from({ length: 12 }, (_, i) => `<ellipse cx="${x}" cy="${y - 37}" rx="3.2" ry="6" fill="#ffd24d" stroke-width="1" transform="rotate(${i * 30} ${x} ${y - 29})"/>`).join('') + `<circle cx="${x}" cy="${y - 29}" r="5" fill="#9c6f52"/>`)(P(.52, 8.22, .5))],
   ['bed', bx(6.5, .3, 0, 3.3, .3, 1.9, DARK) + bx(6.5, .6, 0, 3.3, 3.9, .5, DARK) + bx(6.5, .6, .5, 3.3, 3.9, .45, '#ffffff')
     + bx(6.7, .75, .95, 1.3, .8, .22, '#ffffff') + bx(8.3, .75, .95, 1.3, .8, .22, '#ffffff') + bx(6.5, 1.8, .95, 3.3, 2.7, .12, '#f7b5cf')],
   ['lamp', bx(7.95, .34, 1.9, .34, .22, .1, '#9c6f52') + bx(7.98, .34, 2.0, .28, .22, .38, '#fff3b0')],
-  ['cushion', bx(7.0, 2.2, 1.07, .7, .45, .6, '#ffffff') + bx(7.05, 2.35, 1.67, .14, .14, .4, '#ffffff') + bx(7.5, 2.35, 1.67, .14, .14, .4, '#ffffff')
-    + bx(8.5, 2.2, 1.07, .7, .45, .6, '#e9c58f') + bx(8.42, 2.35, 1.35, .12, .2, .35, '#c79a6c') + bx(9.16, 2.35, 1.35, .12, .2, .35, '#c79a6c')],
+  ['pajama', bx(7.0, 2.3, 1.07, .75, .6, .14, '#d9d6dc') + bx(8.5, 2.3, 1.07, .75, .6, .14, '#2d3148')],
+  ['cushion', bx(5.4, 3.0, 0, .7, .45, .6, '#ffffff') + bx(5.45, 3.15, .6, .14, .14, .4, '#ffffff') + bx(5.9, 3.15, .6, .14, .14, .4, '#ffffff')
+    + bx(5.4, 3.9, 0, .7, .45, .6, '#e9c58f') + bx(5.32, 4.02, .28, .12, .2, .35, '#c79a6c') + bx(6.06, 4.02, .28, .12, .2, .35, '#c79a6c')],
   ['sofa', bx(2.9, 5.3, 0, 1, .4, 1.1, '#8fc1a9') + bx(2.9, 5.7, 0, 1, 1.8, .7, '#a9d6bf') + bx(2.9, 7.5, 0, 1, .4, 1.1, '#8fc1a9') + bx(3.9, 5.3, 0, .4, 2.6, 1.5, '#8fc1a9')],
   ['table', chairB(7.7, 6.3, '#6f86b3') + chairL(6.2, 7.6, '#6f86b3') + legs(7.1, 7.2, 1.9, 1.6, .9, '#4a3526') + bx(7.1, 7.2, .9, 1.9, 1.6, .14, WOOD)],
   ['mugs', bx(7.6, 7.5, 1.04, .22, .22, .3, '#ff9ec4') + bx(8.3, 8.1, 1.04, .22, .22, .3, '#8dd8ff')],
   ['ball', (([x, y]) => `<ellipse cx="${x}" cy="${y + 2}" rx="11" ry="4" fill="rgba(74,53,38,.25)" stroke="none"/><circle cx="${x}" cy="${y - 8}" r="10" fill="#fff"/><polygon points="${x - 4},${y - 11} ${x + 3},${y - 12} ${x + 5},${y - 6} ${x - 1},${y - 3} ${x - 5},${y - 6}" fill="#4a3526" stroke="none"/>`)(P(4.6, 9.0))],
-  ['shoes', shoe(5.5, 8.7) + shoe(5.5, 9.0) + shoe(6.35, 8.7) + shoe(6.35, 9.0)],
 ];
 $('room').innerHTML =
   pg([[0, 0, 6], [0, 10, 6], [0, 10, 0], [0, 0, 0]], '#fdeecb') + pg([[0, 0, 6], [10, 0, 6], [10, 0, 0], [0, 0, 0]], '#f6e0b0')
