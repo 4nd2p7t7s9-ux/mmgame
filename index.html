@@ -139,13 +139,16 @@ const bgm = new Audio('pepero-mate/audio/bgm.mp3'); bgm.loop = true; bgm.volume 
 let musicOn = true;
 const playBgm = () => { if (musicOn && bgm.paused) bgm.play().catch(() => {}); };
 const sndBtn = document.getElementById('sndBtn');
-sndBtn.onclick = e => { e.stopPropagation(); musicOn = !musicOn; if (musicOn) playBgm(); else bgm.pause(); sndBtn.textContent = musicOn ? '♪ ON' : '♪ OFF'; };
+const tellGame = () => { if (!frame.hidden && frame.contentWindow) frame.contentWindow.postMessage({ mmSnd: musicOn }, '*'); };
+const toggleSnd = () => { musicOn = !musicOn; if (musicOn) playBgm(); else bgm.pause(); sndBtn.textContent = musicOn ? '♪ ON' : '♪ OFF'; tellGame(); };
+sndBtn.onclick = e => { e.stopPropagation(); toggleSnd(); };
 document.addEventListener('pointerdown', playBgm);
 const frame = document.getElementById('frame');
 function openGame(url) { frame.src = url; frame.hidden = false; document.body.classList.add('playing'); playBgm(); history.pushState({ game: url }, ''); }
 function closeGame() { frame.hidden = true; frame.src = 'about:blank'; document.body.classList.remove('playing'); }
 document.querySelectorAll('a.card').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openGame(a.getAttribute('href')); }));
 window.addEventListener('message', e => { if (e.data === 'mm-home' && !frame.hidden) history.back(); });
+window.addEventListener('message', e => { if (e.data === 'mm-snd-toggle') toggleSnd(); else if (e.data === 'mm-snd-state') tellGame(); });
 window.addEventListener('popstate', closeGame);
 let LANG = 'ko';
 document.getElementById('langBtn').onclick = function () {

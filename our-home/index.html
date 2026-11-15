@@ -59,7 +59,7 @@ body.lang-zh .lk{display:none}
 </head>
 <body class="lang-ko">
 <div class="win">
-  <div class="bar"><a href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a><span>OUR HOME</span><button id="langBtn" type="button">KO</button></div>
+  <div class="bar"><a href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a><span>OUR HOME</span><span style="display:flex;gap:6px"><button id="mmSnd" type="button" hidden>♪ ON</button><button id="langBtn" type="button">KO</button></span></div>
   <div class="stage">
     <svg viewBox="0 0 420 312" xmlns="http://www.w3.org/2000/svg" id="room" stroke="#4a3526" stroke-width="1.6" stroke-linejoin="round"></svg>
   </div>
@@ -68,19 +68,20 @@ body.lang-zh .lk{display:none}
 </div>
 <script>
 const $ = id => document.getElementById(id);
-const L = (ko, zh) => `<span class="lk">${ko}</span><span class="lz">${zh}</span>`;
+const noDot = t => t.replace(/([^.…])\.\s+(?=\S)/g, '$1<br>').replace(/([^.…])\.(?=$|」|<)/g, '$1');   // 韓文不加句點
+const L = (ko, zh) => `<span class="lk">${noDot(ko)}</span><span class="lz">${zh}</span>`;
 
 // ============ 資料 ============
 // 關卡：[家具 id, 圖示, 韓文名, 中文名, 幾對牌, 三星送的小擺飾 id]
 const LEVELS = [
-  ['bed', '🛏️', '더블 침대', '雙人床', 3, null],
-  ['sofa', '🛋️', '소파', '沙發', 4, 'plant'],
+  ['bed', '🛏️', '더블 침대', '雙人床', 2, null],
+  ['sofa', '🛋️', '소파', '沙發', 3, 'plant'],
   ['table', '🍽️', '식탁', '餐桌', 4, 'mugs'],
-  ['fridge', '🧊', '냉장고', '冰箱', 5, 'magnet'],
+  ['fridge', '🧊', '냉장고', '冰箱', 4, 'magnet'],
   ['tv', '📺', 'TV', '電視', 5, null],
-  ['closet', '🚪', '옷장', '衣櫃', 6, null],
+  ['closet', '🚪', '옷장', '衣櫃', 5, null],
   ['desk', '💡', '책상', '書桌', 6, 'frame'],
-  ['ball', '⚽', '축구공', '足球', 7, null],
+  ['ball', '⚽', '축구공', '足球', 6, null],
   ['cushion', '🧸', '쿠션', '抱枕', 8, 'book'],
 ];
 const DECO = { plant: ['해바라기', '向日葵'], mugs: ['커플 머그컵', '成對的馬克杯'], magnet: ['냉장고 메모', '冰箱便條紙'], frame: ['사진 액자', '合照相框'], book: ['심리학 책', '心理學課本'] };
@@ -152,7 +153,7 @@ function home(fresh) {
 function play(n) {
   const [id, icon, ko, zh, pairs] = LEVELS[n];
   const s3 = pairs * 2, s2 = pairs * 2 + 3, limit = pairs * 3 + 4;
-  const cols = pairs <= 3 ? 3 : pairs === 5 || pairs === 7 ? 5 : 4;
+  const cols = pairs === 2 ? 2 : pairs === 3 ? 3 : pairs === 5 ? 5 : 4;
   const pick = SERIES.filter(x => typeof x === 'number').sort(() => Math.random() - .5).concat(SERIES.filter(x => typeof x !== 'number')).slice(0, pairs);
   const deck = pick.flatMap(k => typeof k === 'number' ? [[k, `<img src="img/s${k}h.jpg" alt="">`], [k, `<img src="img/s${k}m.jpg" alt="">`]] : [[k, k], [k, k]]).sort(() => Math.random() - .5);
   let open = [], done = 0, moves = 0, lock = true;
@@ -191,12 +192,18 @@ function win(n, st) {
   if (newGift) { deco[gift] = 1; fresh.push(gift); }
   save(); renderRoom(fresh); info(`${icon} ${L(ko, zh)}`, 'CLEAR');
   $('box').innerHTML = `<div class="tag">CLEAR</div><div class="stars">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</div>
-    <div class="line">${first ? L(`「${ko}」을(를) 얻었어요!`, `得到「${zh}」了！`) : L('다시 깼어요!', '再次過關！')}${newGift ? '<br>' + L(`보너스: 「${DECO[gift][0]}」`, `額外獲得：「${DECO[gift][1]}」`) : ''}</div>
+    <div class="line">${first ? L(`「${ko}」을(를) 얻었어요!`, `得到「${zh}」了！`) : L('다시 깼어요!', '再次過關！')}</div>
     <div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
   $('nx').onclick = () => {
-    const lines = (first ? TALK[id] : []).concat(newGift ? TALK[gift] : []);
     const after = () => (owned() === LEVELS.length && !seenEnd) ? (seenEnd = true, save(), say(TALK.end, () => home())) : home();
-    lines.length ? say(lines, after) : after();
+    // 三顆星：先顯示「額外禮物」，再出現那個禮物的對話
+    const giftStep = () => {
+      if (!newGift) return after();
+      $('box').innerHTML = `<div class="tag">GIFT</div><div class="stars">★★★</div><div class="line">${L(`추가 선물: 「${DECO[gift][0]}」`, `額外禮物：「${DECO[gift][1]}」`)}</div>
+        <div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
+      $('nx').onclick = () => say(TALK[gift], after);
+    };
+    first ? say(TALK[id], giftStep) : giftStep();
   };
 }
 
@@ -249,6 +256,16 @@ $('room').innerHTML =
 ['img/hu.png', 'img/mi.png'].concat(SERIES.flatMap(k => [`img/s${k}h.jpg`, `img/s${k}m.jpg`])).forEach(u => { new Image().src = u; });
 renderRoom();
 if (seenIntro) home(); else { info(L('우리 집', '我們的家'), ''); say(TALK.intro, () => { seenIntro = true; save(); home(); }); }
+
+// ---- 從主頁打開時：用這顆按鈕開關主頁的音樂 ----
+(function () {
+  if (window.parent === window) return;
+  const b = document.getElementById('mmSnd');
+  b.hidden = false;
+  b.addEventListener('click', e => { e.stopImmediatePropagation(); window.parent.postMessage('mm-snd-toggle', '*'); }, true);
+  window.addEventListener('message', e => { if (e.data && e.data.mmSnd !== undefined) { b.textContent = e.data.mmSnd ? '♪ ON' : '♪ OFF'; b.classList.toggle('off', !e.data.mmSnd); } });
+  window.parent.postMessage('mm-snd-state', '*');
+})();
 </script>
 </body>
 </html>

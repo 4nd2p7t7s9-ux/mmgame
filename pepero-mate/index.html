@@ -88,7 +88,7 @@ body.lang-zh .zh.os::before{content:"♥ ";color:var(--pink-d)}
   <div class="bar">
     <a class="home" href="../" onclick="if(window.parent!==window){window.parent.postMessage('mm-home','*');return false}">◀ HOME</a>
     <div class="bar-btns">
-      <button id="sndBtn" type="button">♪ ON</button>
+      <button id="sndBtn" data-mm="1" type="button">♪ ON</button>
       <button id="langBtn" type="button">KO</button>
       <button id="menuBtn" type="button" hidden>MENU</button>
     </div>
@@ -433,7 +433,7 @@ function toggleSound(){
 // 瀏覽器需要使用者操作後才能播放音樂，所以第一次點畫面時開始播
 document.addEventListener('pointerdown', playBgm);
 $('sndBtn').addEventListener('click', e => { e.stopPropagation(); toggleSound(); });
-if (EMBED) $('sndBtn').hidden = true;
+
 renderSnd();
 
 // ============ 語言切換 ============
@@ -535,6 +535,16 @@ $('menuBtn').onclick = () => { renderMeter(); showMenu(); };
 
 renderMeter();
 showMenu();
+
+// ---- 從主頁打開時：用這顆按鈕開關主頁的音樂 ----
+(function () {
+  if (window.parent === window) return;
+  const b = document.getElementById('sndBtn');
+  b.hidden = false;
+  b.addEventListener('click', e => { e.stopImmediatePropagation(); window.parent.postMessage('mm-snd-toggle', '*'); }, true);
+  window.addEventListener('message', e => { if (e.data && e.data.mmSnd !== undefined) { b.textContent = e.data.mmSnd ? '♪ ON' : '♪ OFF'; b.classList.toggle('off', !e.data.mmSnd); } });
+  window.parent.postMessage('mm-snd-state', '*');
+})();
 </script>
 </body>
 </html>
