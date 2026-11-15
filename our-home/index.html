@@ -116,6 +116,7 @@ const TALK = {
 // ============ 狀態 ============
 let stars = Array(LEVELS.length).fill(0), deco = {}, seenIntro = false, seenEnd = false;
 try { const d = JSON.parse(localStorage.getItem('mm-home') || 'null'); if (d) ({ stars, deco, seenIntro, seenEnd } = d); } catch (e) {}
+if (!stars.every(x => x === 3)) seenEnd = false;   // 結局要全部三顆星才會出現
 const save = () => { try { localStorage.setItem('mm-home', JSON.stringify({ stars, deco, seenIntro, seenEnd })); } catch (e) {} };
 const owned = () => stars.filter(s => s > 0).length;
 
@@ -147,7 +148,7 @@ function home(fresh) {
   renderRoom(fresh);
   info(L('우리 집', '我們的家'), `${owned()}/${LEVELS.length}`);
   const next = stars.findIndex(s => !s);
-  $('box').innerHTML = `<div class="tag">STAGE</div><div class="line">${next < 0 ? L('가구를 다 모았어요! 다시 도전해서 ★3개를 노려 보세요.', '家具全部收齊了！可以再挑戰拿三顆星。') : L('같은 옷을 입은 두 사람을 찾아 가구를 얻으세요.', '翻出穿同一套衣服的兩個人，贏得家具。')}</div>
+  $('box').innerHTML = `<div class="tag">STAGE</div><div class="line">${next < 0 ? (stars.every(x => x === 3) ? L('전부 ★★★! 완벽한 우리 집이에요', '全部三顆星！完美的家。') : L('가구를 다 모았어요! 전부 ★★★로 깨면 마지막 이야기가 나와요', '家具全部收齊了！全部三顆星過關，會出現最後的故事。')) : L('같은 옷을 입은 두 사람을 찾아 가구를 얻으세요.', '翻出穿同一套衣服的兩個人，贏得家具。')}</div>
     <div class="levels">${LEVELS.map((l, i) => `<button class="lv${i === next ? ' next' : ''}" data-i="${i}" type="button"${next >= 0 && i > next ? ' disabled' : ''}><b>${l[1]}</b><span>${L(l[2], l[3])}</span><i>${'★'.repeat(stars[i])}${'☆'.repeat(stars[i] ? 3 - stars[i] : 0)}</i></button>`).join('')}</div>
     <div class="sub">${L('★3개로 깨면 작은 소품을 더 받아요. 방 안의 가구를 눌러 보세요.', '三顆星過關會多送小擺飾。房間裡的家具可以點點看。')}</div>`;
   $('box').querySelectorAll('.lv').forEach(b => b.onclick = () => play(+b.dataset.i));
@@ -156,7 +157,7 @@ function home(fresh) {
 // ============ 翻牌 ============
 function play(n) {
   const [id, icon, ko, zh, pairs] = LEVELS[n];
-  const s3 = pairs * 2, s2 = pairs * 2 + 3, limit = pairs * 3 + 4;
+  const s3 = Math.ceil(pairs * 1.5) + 1, s2 = pairs * 2 + 1, limit = Math.ceil(pairs * 2.5) + 2;
   const cols = pairs === 2 ? 2 : pairs === 3 ? 3 : pairs === 5 ? 5 : 4;
   const pick = SERIES.filter(x => typeof x === 'number').sort(() => Math.random() - .5).concat(SERIES.filter(x => typeof x !== 'number')).slice(0, pairs);
   const deck = pick.flatMap(k => typeof k === 'number' ? [[k, `<img src="img/s${k}h.jpg" alt="">`], [k, `<img src="img/s${k}m.jpg" alt="">`]] : [[k, k], [k, k]]).sort(() => Math.random() - .5);
@@ -199,7 +200,7 @@ function win(n, st) {
     <div class="line">${first ? L(`「${ko}」을(를) 얻었어요!`, `得到「${zh}」了！`) : L('다시 깼어요!', '再次過關！')}</div>
     <div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
   $('nx').onclick = () => {
-    const after = () => (owned() === LEVELS.length && !seenEnd) ? (seenEnd = true, save(), say(TALK.end, () => home())) : home();
+    const after = () => (stars.every(x => x === 3) && !seenEnd) ? (seenEnd = true, save(), say(TALK.end, () => home())) : home();
     // 三顆星：先顯示「額外禮物」，再出現那個禮物的對話
     const giftStep = () => {
       if (!newGift) return after();
