@@ -52,7 +52,7 @@ body.lang-zh .lk{display:none}
 .talk{display:flex;gap:12px;align-items:center;min-height:170px}
 .talk.r{flex-direction:row-reverse}
 .talk img{height:165px;flex:none}
-.bub{position:relative;margin:4px;background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #f3e6c4;padding:8px 10px;font-size:13.5px;line-height:1.5;font-weight:700}
+.bub{position:relative;margin:4px;background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #f3e6c4;padding:8px 10px;font-size:min(11.5px,2.95vw);line-height:1.5;font-weight:700;white-space:nowrap}
 .stars{font-size:22px;letter-spacing:4px;color:var(--main-d);margin-bottom:6px}
 .note{position:relative;width:190px;margin:10px auto 4px;padding:22px 16px 16px;background:#ffe98a;border:3px solid var(--ink);box-shadow:4px 4px 0 rgba(74,53,38,.35);transform:rotate(-3deg);font-size:15px;line-height:1.7;font-weight:900}
 .note::before{content:"";position:absolute;left:50%;top:-9px;width:54px;height:16px;margin-left:-27px;background:#ff9ec4;border:2px solid var(--ink);transform:rotate(2deg)}
@@ -71,7 +71,7 @@ body.lang-zh .lk{display:none}
 </div>
 <script>
 const $ = id => document.getElementById(id);
-const noDot = t => t.replace(/([^.…])\.\s+(?=\S)/g, '$1<br>').replace(/([^.…])\.(?=$|」|<)/g, '$1');   // 韓文不加句點
+const noDot = t => t.replace(/([^.…])\.(?=$|」|<)/g, '$1');   // 韓文不加句點
 const L = (ko, zh) => `<span class="lk">${noDot(ko)}</span><span class="lz">${zh}</span>`;
 
 // ============ 資料 ============
@@ -141,6 +141,8 @@ function say(lines, done) {
       ? `<div class="tag">NARRATION</div><div class="line">${L(ko, zh)}</div>`
       : `<div class="talk${w === 'm' ? ' r' : ''}"><img src="img/${w === 'h' ? 'hu' : 'mi'}.png" alt=""><div class="bub">${L(ko, zh)}</div></div>`)
       + `<div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;
+    const bb = $('box').querySelector('.bub');   // 一行真的放不下才換行
+    if (bb) { const r = bb.getBoundingClientRect(), o = $('box').getBoundingClientRect(); if (r.right > o.right - 8 || r.left < o.left + 8) bb.style.whiteSpace = 'normal'; }
     $('nx').onclick = () => { if (++i < lines.length) draw(); else done(); };
   };
   draw();
