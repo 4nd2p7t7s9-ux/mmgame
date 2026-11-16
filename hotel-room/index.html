@@ -146,7 +146,8 @@ body.lang-zh .lk{display:none}
 
 <script>
 const $ = id => document.getElementById(id);
-const L = (ko, zh) => `<span class="lk">${ko}</span><span class="lz">${zh}</span>`;
+const noDot = t => t.replace(/([^.…])\.(?=$|」|<|\))/g, '$1');   // 韓文句尾不加句點
+const L = (ko, zh) => `<span class="lk">${noDot(ko)}</span><span class="lz">${zh}</span>`;
 
 // ============ data ============
 const MISSIONS = [null,
@@ -169,7 +170,7 @@ const TAGS = {
 function br(t, zh) {
   return zh ? t.replace(/([。！？])(?=[^」）)。！？，\s])/g, '$1<br>') : t.replace(/([.?!]) (?=\S)/g, '$1<br>');
 }
-const LB = (ko, zh) => L(br(ko), br(zh, 1));
+const LB = (ko, zh) => L(ko, zh);   // 不強制換行
 function setNarr(html) { $('bH').className = $('bM').className = 'bub'; $('cast').classList.remove('talk'); $('cast').hidden = !!html; $('bN').parentNode.classList.remove('sys'); $('narr').innerHTML = html; }
 function setSide(tag, html) { setNarr(`<div class="who"><span class="tag plain">${tag}</span></div><div class="line nar">${html}</div>`); }
 
@@ -212,6 +213,16 @@ function drawLine() {
     $('cast').classList.add('talk');
     $('chH').classList.toggle('dim', t[0] !== 'bH'); $('chM').classList.toggle('dim', t[0] !== 'bM');
     $(t[0]).innerHTML = LB(ko, zh);
+    // 盡量排在同一行：放不下就把字縮小，縮到最小還是放不下才換行
+    $('cast').classList.add('talk');   // 先讓人物顯示出來，量到的寬度才是對的
+    const el = $(t[0]), slot = $('cast').clientWidth - 20 - $(t[0] === 'bH' ? 'chH' : 'chM').offsetWidth - 12, room = slot - 30;   // 對話框可以蓋到沒在說話的那個人上面
+    el.style.zIndex = 2;
+    el.style.maxWidth = (slot - 8) + 'px';
+    const rng = document.createRange(); rng.selectNodeContents([...el.children].find(c => c.offsetWidth > 0) || el);
+    const textW = () => rng.getBoundingClientRect().width;
+    let fs = 12.5; el.style.whiteSpace = 'nowrap'; el.style.fontSize = fs + 'px';
+    while (textW() > room && fs > 9.5) { fs -= .5; el.style.fontSize = fs + 'px'; }
+    if (textW() > room) el.style.whiteSpace = 'normal';
   } else setSide('NARRATION', LB(ko, zh));
   $('hintTxt').innerHTML = '';
 }
@@ -265,12 +276,12 @@ function clear(n, lines, tail) {
   say(lines.concat(tail || [], [['n', `미션 ${n} 완료! (${n}/5)`, `任務 ${n} 完成！（${n}/5）`, '']]), () => { S.m = n + 1; render(); intro(n + 1); });
 }
 const N = (ko, zh, fx) => ['n', ko, zh, fx];
-const NOPE = () => say([N('지금은 볼일이 없다.', '現在用不到。')]);
+const NOPE = () => say([N('지금은 쓸 일이 없다.', '現在用不到。')]);
 
 // ============ missions ============
 function intro(m) {
   if (m === 2) say([['h', '머리 말려 주기? 드라이기부터 찾자!', '吹頭髮？先找吹風機！']]);
-  else if (m === 3) say([['h', '야식이다! 뭐 먹을 거 없나?', '宵夜耶！有沒有吃的？'], ['m', '……미니바 한번 봐.', '……看看小冰箱。']]);
+  else if (m === 3) say([['h', '야식이다! 뭐 먹을 거 없나?', '宵夜耶！有沒有吃的？'], ['m', '……미니바 한번 봐 봐.', '……看看小冰箱。']]);
   else if (m === 4) say([['h', '영화! 리모컨이 어디 있지?', '電影！遙控器在哪裡？']]);
   else if (m === 5) say([['h', '마지막 미션이다! 손…… 잡기?', '最後一個任務！牽……手？'], ['m', '……', '……'], N('만재가 반 걸음 물러섰다.', '財財往後退了半步。')], hand);
   else if (m === 6) say([N('철컥. 문이 열렸다.', '喀嚓。門開了。')]);
@@ -278,7 +289,7 @@ function intro(m) {
 }
 function hand() {
   ask('후후는 어떻게 할까?', '熏熏要怎麼做？', [
-    ['그냥 확 잡는다!!!!!!', '直接抓住他的手!!!!!!', [N('만재가 손을 뒤로 숨겼다.', '財財把手藏到背後。'), ['mo', '(갑자기는 무리야.)', '(太突然了，不行。)']]],
+    ['그냥 손을 확 잡는다!!!!!!', '直接牽起來!!!!!!', [N('만재가 손을 뒤로 숨겼다.', '財財把手藏到背後。'), ['mo', '(갑자기는 무리야.)', '(太突然了，不行。)']]],
     ['“만재야, 미션이니까 어쩔 수 없잖아ㅜㅜ”', '「財財這是任務，沒辦法啊ㅜㅜ」', [['m', '……알아.', '……我知道。'], N('그래도 손은 주머니에서 나오지 않았다.', '但他的手還是沒有從口袋裡出來。'), ['mo', '(미션이라서 잡는 건 싫은데.)', '(不想只是因為任務才牽。)']]],
     ['손을 내밀고 기다린다', '伸出手，等他', [N('후후는 아무 말 없이 손을 내밀었다. 잠옷 소매가 손을 덮고 있었다.', '熏熏什麼都沒說，只是伸出手。睡衣的袖子蓋住了手。'), N('한참 뒤, 만재의 손이 천천히 올라왔다.', '過了很久，財財的手慢慢伸了過來。'), ['mo', '(……기다려 주는구나.)', '(……他在等我。)']]],
   ], hold);
@@ -368,7 +379,7 @@ function act(t) {
     case 'clock':
       if (m === 4 && !F.batt) {
         F.batt = 1; add('batt');
-        const l = [N('알람 시계에서 건전지를 뺐다. 시계가 멈췄다.', '從鬧鐘拿出電池。時鐘停了。'), ['h', '이제 몇 시인지 모르겠다.', '這樣就不知道幾點了。'], ['m', '……몰라도 돼.', '……不知道也沒關係。']];
+        const l = [N('알람 시계에서 건전지를 뺐다. 시계가 멈췄다.', '從鬧鐘拿出電池。時鐘停了。'), ['h', '이제 몇 시인지 모르겠네.', '這樣就不知道幾點了。'], ['m', '……몰라도 돼.', '……不知道也沒關係。']];
         if (has('remote')) { del('batt'); F.on = 1; l.push(LOAD); }
         return say(l, () => { render(); idle(); });
       }
@@ -384,7 +395,7 @@ function act(t) {
             [N('찰칵.', '喀嚓。'), ['h', '잘 나왔다!', '拍得很好耶！'], ['mo', '(나한테도 보내 줘.)', '(要傳給我。)']]);
         } else if (has('cable')) {
           del('cable'); S.plug = 'cable';
-          return say([N('충전기를 먼저 콘센트에 꽂아 두었다.', '先把充電線插在插座上了。'), ['m', '이제 휴대폰이 필요해.', '還需要手機。']], () => { render(); idle(); });
+          return say([N('충전기를 먼저 콘센트에 꽂아 두었다.', '先把充電線插在插座上了。'), ['m', '이제 휴대폰만 있으면 돼.', '還需要手機。']], () => { render(); idle(); });
         } else return say([N('충전기가 꽂혀 있다. 휴대폰만 있으면 된다.', '充電線已經插好了，只差手機。')]);
       }
       if (m === 2 && has('dryer')) {
@@ -400,12 +411,12 @@ function act(t) {
       if (!F.food) return say([['m', '주전자에 물이 없어.', '熱水壺裡沒有水。']]);
       if (!F.hot) {
         del('water'); F.kw = F.hot = 1; S.plug = 'kettle'; render();
-        return say([N('주전자에 물을 부었다.', '把水倒進熱水壺。'), ['h', '콘센트가 또 차 있네…… 드라이기부터 뽑자.', '插座又被佔住了……先把吹風機拔掉吧。'], N('주전자를 꽂자 금방 물이 끓었다.', '熱水壺插上電，水很快就燒開了。')], () => { render(); idle(); });
+        return say([N('주전자에 물을 부었다.', '把水倒進熱水壺。'), ['h', '콘센트 자리가 또 없네…… 드라이기부터 뽑자.', '插座又被佔住了……先把吹風機拔掉吧。'], N('주전자를 꽂자 금방 물이 끓었다.', '熱水壺插上電，水很快就燒開了。')], () => { render(); idle(); });
       }
       if (!F.ready) { del('ramen'); F.ready = 1; return say([N('컵라면에 뜨거운 물을 부었다. 3분만 기다리면 된다.', '把熱水倒進泡麵。等三分鐘就好。')]); }
-      if (!has('chop')) return say([['h', '다 익었다! 근데 젓가락이 없어.', '泡好了！可是沒有筷子。']]);
+      if (!has('chop')) return say([['h', '다 됐다! 근데 젓가락이 없어.', '泡好了！可是沒有筷子。']]);
       del('chop'); render();
-      return clear(3, [['h', '젓가락이 한 쌍뿐이네.', '筷子只有一雙耶。'], ['m', '……너 먼저 먹어.', '……你先吃。'], ['h', '그럼 번갈아 먹자. 자, 아—', '那我們輪流吃。來，啊—'], ['m', '……내가 먹을 수 있어.', '……我自己會吃。'], ['mo', '(결국 받아먹었다.)', '(結果還是被餵了。)']]);
+      return clear(3, [['h', '젓가락이 한 쌍뿐이네.', '筷子只有一雙耶。'], ['m', '……너 먼저 먹어.', '……你先吃。'], ['h', '그럼 번갈아 먹자. 자, 아—', '那我們輪流吃。來，啊—'], ['m', '……혼자 먹을 수 있어.', '……我自己會吃。'], ['mo', '(결국 받아먹었다.)', '(結果還是被餵了。)']]);
     case 'tv':
       if (m !== 4) return NOPE();
       if (!has('remote')) return say([['m', '리모컨이 있어야 해.', '要有遙控器。']]);
