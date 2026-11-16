@@ -57,6 +57,8 @@ body.lang-zh .lk{display:none}
 .note{position:relative;width:190px;margin:10px auto 4px;padding:22px 16px 16px;background:#ffe98a;border:3px solid var(--ink);box-shadow:4px 4px 0 rgba(74,53,38,.35);transform:rotate(-3deg);font-size:15px;line-height:1.7;font-weight:900}
 .note::before{content:"";position:absolute;left:50%;top:-9px;width:54px;height:16px;margin-left:-27px;background:#ff9ec4;border:2px solid var(--ink);transform:rotate(2deg)}
 .note i{display:block;font-style:normal;text-align:right;margin-top:6px;font-size:13px}
+.lock{display:block;width:100%;margin-top:10px;padding:10px;border:3px dashed #b9ad98;background:#f1ece2;color:#a39780;font-family:"Press Start 2P",monospace;font-size:10px;cursor:pointer}
+.lock:active{background:#e8e1d2}
 [hidden]{display:none !important}
 </style>
 </head>
@@ -155,8 +157,15 @@ function home(fresh) {
   const next = stars.findIndex(s => !s);
   $('box').innerHTML = `<div class="tag">STAGE</div><div class="line">${next < 0 ? (stars.every(x => x === 3) ? L('전부 ★★★! 완벽한 우리 집이에요', '全部三顆星！完美的家。') : L('가구를 다 모았어요! 전부 ★★★로 깨면 마지막 이야기가 나와요', '家具全部收齊了！全部三顆星過關，會出現最後的故事。')) : L('같은 옷을 입은 두 사람을 찾아 가구를 얻으세요.', '翻出穿同一套衣服的兩個人，贏得家具。')}</div>
     <div class="levels">${LEVELS.map((l, i) => `<button class="lv${i === next ? ' next' : ''}" data-i="${i}" type="button"${next >= 0 && i > next ? ' disabled' : ''}><b>${l[1]}</b><span>${L(l[2], l[3])}</span><i>${'★'.repeat(stars[i])}${'☆'.repeat(stars[i] ? 3 - stars[i] : 0)}</i></button>`).join('')}</div>
+    <button class="lock" id="lock2f" type="button">🔒 2F</button>
     <div class="sub">${L('★3개로 깨면 작은 소품을 더 받아요. 방 안의 가구를 눌러 보세요.', '三顆星過關會多送小擺飾。房間裡的家具可以點點看。')}</div>`;
   $('box').querySelectorAll('.lv').forEach(b => b.onclick = () => play(+b.dataset.i));
+  $('lock2f').onclick = () => {
+    info('🔒 2F', 'LOCKED');
+    $('box').innerHTML = `<div class="tag">COMING SOON</div><div class="line">${L('2층은 아직 준비 중이에요', '2 樓還在準備中')}</div><div class="sub">${L('조금만 기다려 주세요!', '敬請期待！')}</div>
+      <div class="row"><button class="btn ghost" id="b" type="button">◀ BACK</button></div>`;
+    $('b').onclick = () => home();
+  };
 }
 
 // ============ 翻牌 ============
