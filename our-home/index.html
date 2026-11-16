@@ -54,6 +54,9 @@ body.lang-zh .lk{display:none}
 .talk img{height:165px;flex:none}
 .bub{position:relative;margin:4px;background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #f3e6c4;padding:8px 10px;font-size:13.5px;line-height:1.5;font-weight:700}
 .stars{font-size:22px;letter-spacing:4px;color:var(--main-d);margin-bottom:6px}
+.note{position:relative;width:190px;margin:10px auto 4px;padding:22px 16px 16px;background:#ffe98a;border:3px solid var(--ink);box-shadow:4px 4px 0 rgba(74,53,38,.35);transform:rotate(-3deg);font-size:15px;line-height:1.7;font-weight:900}
+.note::before{content:"";position:absolute;left:50%;top:-9px;width:54px;height:16px;margin-left:-27px;background:#ff9ec4;border:2px solid var(--ink);transform:rotate(2deg)}
+.note i{display:block;font-style:normal;text-align:right;margin-top:6px;font-size:13px}
 [hidden]{display:none !important}
 </style>
 </head>
@@ -102,7 +105,7 @@ const TALK = {
   cushion: [['h', '토끼는 내 거, 강아지는 만재 거!', '兔子是我的，狗狗是財財的！'], ['m', '근데 네가 강아지 들고 있잖아……', '可是你拿著狗狗……'], ['n', '이제 정말 집 같다.', '現在真的像家了。']],
   plant: [['h', '물은 내가 줄게.', '水我來澆。']],
   mugs: [['m', '분홍색이 네 거.', '粉紅色是你的。']],
-  magnet: [['n', '「냉장고에 밥 있어. 데우기만 하면 돼. 꼭 챙겨 먹어!! — 후후」', '「冰箱已經有飯了，加熱就好，一定要記得吃飯！！ — 熏熏」']],
+  magnet: [['note', '냉장고에 밥 있어<br>데우기만 하면 돼<br>꼭 챙겨 먹어!!<i>— 후후</i>', '冰箱已經有飯了<br>加熱就好<br>一定要記得吃飯！！<i>— 熏熏</i>']],
   frame: [['n', '같이 축구 경기 보러 가서 찍은 그 사진이다.', '是一起去看足球比賽拍的那張照片。']],
   book: [['h', '책 제목이 「회피형 인격」이래.', '課本名稱是迴避型人格。'], ['m', '……나로 과제 하지 마.', '……不要拿我當作業。']],
   lamp: [['h', '켜 놓고 자도 돼?', '開著睡可以嗎？'], ['m', '응.', '好。']],
@@ -134,7 +137,7 @@ function say(lines, done) {
   let i = 0;
   const draw = () => {
     const [w, ko, zh] = lines[i];
-    $('box').innerHTML = (w === 'n'
+    $('box').innerHTML = (w === 'note' ? `<div class="note">${L(ko, zh)}</div>` : w === 'n'
       ? `<div class="tag">NARRATION</div><div class="line">${L(ko, zh)}</div>`
       : `<div class="talk${w === 'm' ? ' r' : ''}"><img src="img/${w === 'h' ? 'hu' : 'mi'}.png" alt=""><div class="bub">${L(ko, zh)}</div></div>`)
       + `<div class="row"><button class="btn" id="nx" type="button">NEXT ▶</button></div>`;

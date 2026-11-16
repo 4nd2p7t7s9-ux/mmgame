@@ -32,7 +32,7 @@ body{background-color:#e4e1f0;background-image:radial-gradient(circle at 18px 18
 .ch.dim{opacity:.3}
 .cast:not(.talk) .ch{display:none}
 .bubs{flex:1;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:4px 0 12px}
-.bub{position:relative;margin:4px;max-width:calc(100% - 8px);background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #dcd8ec;padding:8px 10px;font-size:12.5px;line-height:1.45;font-weight:700;min-height:36px;display:flex;flex-direction:column;justify-content:center;visibility:hidden}
+.bub{position:relative;margin:4px;max-width:calc(100% - 8px);background:#fff;box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),inset 0 0 0 3px #dcd8ec;padding:8px 10px;font-size:min(10.5px,2.7vw);line-height:1.45;font-weight:700;min-height:36px;display:flex;flex-direction:column;justify-content:center;visibility:hidden}
 .bub.on{visibility:visible}
 .bub.os{background:#f1eff8;color:#77709a}
 #bH{align-self:flex-start}
@@ -220,8 +220,7 @@ function drawLine() {
     el.style.maxWidth = (slot - 8) + 'px';
     const rng = document.createRange(); rng.selectNodeContents([...el.children].find(c => c.offsetWidth > 0) || el);
     const textW = () => rng.getBoundingClientRect().width;
-    let fs = 12.5; el.style.whiteSpace = 'nowrap'; el.style.fontSize = fs + 'px';
-    while (textW() > room && fs > 9.5) { fs -= .5; el.style.fontSize = fs + 'px'; }
+    el.style.whiteSpace = 'nowrap';   // 所有對話框字體大小一致，不個別縮小
     if (textW() > room) el.style.whiteSpace = 'normal';
   } else setSide('NARRATION', LB(ko, zh));
   $('hintTxt').innerHTML = '';
