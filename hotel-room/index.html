@@ -146,8 +146,8 @@ body.lang-zh .lk{display:none}
 
 <script>
 const $ = id => document.getElementById(id);
-const noDot = t => t.replace(/([^.…])\.(?=$|」|<|\))/g, '$1');   // 韓文句尾不加句點
-const L = (ko, zh) => `<span class="lk">${noDot(ko)}</span><span class="lz">${zh}</span>`;
+const talkKo = t => t.replace(/([^.…])\.(?=\s|$|\)|<|”)/g, '$1').replace(/,\s*/g, ' ');   // 韓文對話不用逗號、句號；旁白照常
+const L = (ko, zh) => `<span class="lk">${ko}</span><span class="lz">${zh}</span>`;
 
 // ============ data ============
 const MISSIONS = [null,
@@ -212,7 +212,7 @@ function drawLine() {
     $(t[0]).className = 'bub on ' + t[2];
     $('cast').classList.add('talk');
     $('chH').classList.toggle('dim', t[0] !== 'bH'); $('chM').classList.toggle('dim', t[0] !== 'bM');
-    $(t[0]).innerHTML = LB(ko, zh);
+    $(t[0]).innerHTML = LB(talkKo(ko), zh);
     // 盡量排在同一行：放不下就把字縮小，縮到最小還是放不下才換行
     $('cast').classList.add('talk');   // 先讓人物顯示出來，量到的寬度才是對的
     const el = $(t[0]), slot = $('cast').clientWidth - 20 - $(t[0] === 'bH' ? 'chH' : 'chM').offsetWidth - 12, room = slot - 30;   // 對話框可以蓋到沒在說話的那個人上面
@@ -262,7 +262,7 @@ function next() {
 function ask(ko, zh, opts, onAll, step = 0, any = false) {
   choosing = true; render();
   setNarr(`<div class="who"><span class="tag plain">CHOOSE</span></div><div class="line">${L(ko, zh)}</div><div class="choices">${
-    opts.map((o, i) => `<button class="choice${i < step ? ' done' : ''}" data-c="${i}" type="button"${any || i === step ? '' : ' disabled'}><i>${i + 1}</i><span>${L(o[0], o[1])}</span></button>`).join('')}</div>`);
+    opts.map((o, i) => `<button class="choice${i < step ? ' done' : ''}" data-c="${i}" type="button"${any || i === step ? '' : ' disabled'}><i>${i + 1}</i><span>${L(talkKo(o[0]), o[1])}</span></button>`).join('')}</div>`);
   $('hintTxt').innerHTML = '';
   $('box').querySelectorAll('.choice').forEach(b => b.onclick = e => {
     const i = +b.dataset.c;
@@ -309,7 +309,7 @@ function hold() {
     holdT = setInterval(() => {
       const s = (Date.now() - start) / 1000, left = Math.max(0, 10 - s);
       $('holdBar').style.width = Math.min(100, s * 10) + '%'; $('holdNum').textContent = Math.ceil(left);
-      $('holdLine').innerHTML = s < 1 ? '&nbsp;' : s < 4 ? L('후후: (……)', '熏熏：(……)') : s < 7 ? L('만재: (10초가 이렇게 길었나.)', '財財：(十秒有這麼長嗎。)') : L('후후: (이 미션 진짜 좋다.)', '熏熏：(這任務真好。)');
+      $('holdLine').innerHTML = s < 1 ? '&nbsp;' : s < 4 ? L('후후: (……)', '熏熏：(……)') : s < 7 ? L('만재: (10초가 이렇게 길었나)', '財財：(十秒有這麼長嗎。)') : L('후후: (이 미션 진짜 좋다)', '熏熏：(這任務真好。)');
       if (s >= 10) stop(true);
     }, 100);
   };
