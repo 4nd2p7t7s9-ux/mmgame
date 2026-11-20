@@ -174,7 +174,7 @@ function play(n) {
   const s3 = Math.ceil(pairs * 1.5) + 1, s2 = pairs * 2 + 1, limit = Math.ceil(pairs * 2.5) + 2;
   const cols = pairs === 2 ? 2 : pairs === 3 ? 3 : pairs === 5 ? 5 : 4;
   const pick = SERIES.filter(x => typeof x === 'number').sort(() => Math.random() - .5).concat(SERIES.filter(x => typeof x !== 'number')).slice(0, pairs);
-  const deck = pick.flatMap(k => typeof k === 'number' ? [[k, `<img src="img/s${k}h.jpg" alt="">`], [k, `<img src="img/s${k}m.jpg" alt="">`]] : [[k, k], [k, k]]).sort(() => Math.random() - .5);
+  const deck = pick.flatMap(k => typeof k === 'number' ? [[k, `<img src="img/s${k}h.jpg?v=2" alt="">`], [k, `<img src="img/s${k}m.jpg" alt="">`]] : [[k, k], [k, k]]).sort(() => Math.random() - .5);
   let open = [], done = 0, moves = 0, lock = true;
   const head = () => info(`${icon} ${L(ko, zh)}`, `${moves}/${limit}`);
   head();
@@ -284,7 +284,7 @@ $('room').innerHTML =
   + pg([[4.0, 0, 4.6], [6.0, 0, 4.6], [6.0, 0, 2.5], [4.0, 0, 2.5]], '#bfe3f7', 'stroke-width="3" stroke="#fff"') + pg([[4.0, 0, 4.6], [6.0, 0, 4.6], [6.0, 0, 2.5], [4.0, 0, 2.5]], 'none') + pg([[5.0, 0, 4.6], [5.0, 0, 2.5]], 'none') + pg([[4.0, 0, 3.55], [6.0, 0, 3.55]], 'none')
   + ITEMS.map(([id, g]) => `<g class="f" data-f="${id}" hidden>${g}</g>`).join('');
 // 先在背景把牌和人物的圖載好，進關卡時就不用等
-['img/hu.png', 'img/mi.png'].concat(SERIES.flatMap(k => [`img/s${k}h.jpg`, `img/s${k}m.jpg`])).forEach(u => { new Image().src = u; });
+['img/hu.png', 'img/mi.png'].concat(SERIES.flatMap(k => [`img/s${k}h.jpg?v=2`, `img/s${k}m.jpg`])).forEach(u => { new Image().src = u; });
 renderRoom();
 if (seenIntro) home(); else { info(L('우리 집', '我們的家'), ''); say(TALK.intro, () => { seenIntro = true; save(); home(); }); }
 
